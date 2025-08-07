@@ -1,5 +1,3 @@
-# docker-prac-guide
-A comprehensive collection of practical Docker CLI commands with detailed explanations, structured for revision, self-learning, and DevOps preparation. Ideal for beginners and intermediate learners who want to master Docker hands-on.
 # 🐳 Docker Master Reference Guide
 **By: Muhammad Anas**  
 > A beginner-friendly, yet comprehensive documentation of Docker CLI commands and concepts, ideal for DevOps learners and revision.
@@ -8,13 +6,13 @@ A comprehensive collection of practical Docker CLI commands with detailed explan
 
 ## 📌 1. What Is Docker?
 
-**Docker** is a platform that allows you to **build**, **package**, and **run applications in isolated environments** called containers. Unlike traditional virtual machines, containers are lightweight, fast, and portable because they share the host system's kernel.
+**Docker** is a platform that allows you to **build**, **package**, and **run applications in isolated environments** called containers. Containers are lightweight and portable, making it easy to run applications consistently across different environments.
 
 ### 📦 Why Use Docker?
-- **Consistency**: Same app behavior in dev, staging, and prod.
-- **Isolation**: Each app runs in its own container.
-- **Portability**: Containers can run anywhere Docker is installed.
-- **Efficiency**: Low resource usage compared to full VMs.
+- **Consistency**: Ensures identical environments from development to production.
+- **Isolation**: Keeps applications and dependencies separate.
+- **Portability**: Runs anywhere Docker is supported.
+- **Efficiency**: Uses fewer system resources than VMs.
 
 ---
 
@@ -27,11 +25,11 @@ Client  <-->  Docker Daemon  <-->  Docker Registry
    +--> Commands            +--> Images (App Blueprints)
 ```
 
-- **Client**: Sends commands (`docker run`, `build`, etc.)
-- **Docker Daemon**: Executes the commands
-- **Registry**: Stores Docker images (e.g., Docker Hub, Amazon ECR)
-- **Images**: Read-only templates used to create containers
-- **Containers**: Live running instances created from images
+- **Client**: Interface where you run Docker commands.
+- **Docker Daemon**: Core service that manages containers and images.
+- **Registry**: Stores Docker images (Docker Hub, Amazon ECR, etc.).
+- **Images**: Templates used to create containers.
+- **Containers**: Live, running instances of images.
 
 ---
 
@@ -39,12 +37,33 @@ Client  <-->  Docker Daemon  <-->  Docker Registry
 
 ```bash
 yum update -y
+```
+> Updates all system packages – ensures latest versions and security fixes.
+
+```bash
 sudo yum install docker -y
+```
+> Installs Docker using the `yum` package manager.
+
+```bash
 which docker
+```
+> Verifies Docker is installed and shows the path to its binary.
+
+```bash
 docker -v
+```
+> Displays the installed version of Docker.
+
+```bash
 service docker start
+```
+> Starts the Docker service so you can begin using Docker.
+
+```bash
 service docker status
 ```
+> Shows whether the Docker daemon is running.
 
 ---
 
@@ -52,10 +71,23 @@ service docker status
 
 ```bash
 docker info
+```
+> Displays system-wide Docker details (containers, images, drivers, etc.).
+
+```bash
 docker ps
+```
+> Lists all currently running containers.
+
+```bash
 docker ps -a
+```
+> Lists all containers, including stopped ones.
+
+```bash
 docker images
 ```
+> Lists all downloaded and created Docker images on your system.
 
 ---
 
@@ -63,8 +95,13 @@ docker images
 
 ```bash
 docker run -it ubuntu /bin/bash
+```
+> Starts a new Ubuntu container interactively with a bash shell.
+
+```bash
 docker run -it --name anascontainer ubuntu /bin/bash
 ```
+> Same as above but names the container `anascontainer` for easier reference.
 
 ---
 
@@ -72,10 +109,23 @@ docker run -it --name anascontainer ubuntu /bin/bash
 
 ```bash
 docker start anascontainer
+```
+> Starts an existing container that has been stopped.
+
+```bash
 docker exec -it anascontainer bash
+```
+> Opens a bash shell inside the running `anascontainer`.
+
+```bash
 docker stop anascontainer
+```
+> Stops a running container gracefully.
+
+```bash
 docker rm anascontainer
 ```
+> Removes a stopped container completely from the system.
 
 ---
 
@@ -83,8 +133,13 @@ docker rm anascontainer
 
 ```bash
 docker diff anascontainer
+```
+> Shows file system changes made inside the container.
+
+```bash
 history
 ```
+> Lists the command history for the current shell session.
 
 ---
 
@@ -92,8 +147,13 @@ history
 
 ```bash
 docker commit anascontainer updateimage
+```
+> Saves the state of the `anascontainer` as a new image named `updateimage`.
+
+```bash
 docker images
 ```
+> Confirms the new image was created and available locally.
 
 ---
 
@@ -102,12 +162,13 @@ docker images
 ```bash
 docker run -it --name practicecontainer updateimage /bin/bash
 ```
+> Creates and starts a new container from the saved `updateimage`.
 
 ---
 
 ## 🛠️ 10. Building Docker Images via Dockerfile
 
-### Dockerfile
+### Dockerfile Example
 ```Dockerfile
 FROM ubuntu:latest
 RUN echo "I am learning DevOps" > /tmp/testfile
@@ -115,29 +176,40 @@ RUN echo "I am learning DevOps" > /tmp/testfile
 
 ```bash
 docker build -t testimage .
+```
+> Builds an image named `testimage` from the current directory.
+
+```bash
 docker run -it --name testcontainer testimage /bin/bash
 cat /tmp/testfile
 ```
+> Starts a container from `testimage` and verifies the file inside it.
 
 ---
 
 ## 📦 11. Docker Volumes: Data Persistence
 
 ### Share Data Between Containers
+
 ```bash
 docker run -it --name container1 myimage /bin/bash
 # Inside container1
 mkdir myvolume && cd myvolume && touch file1 file2 file3
+```
 
+```bash
 docker run -it --name container2 --volumes-from container1 ubuntu /bin/bash
 cd myvolume && ls
 ```
+> Shares the volume from container1 to container2 – shows the same files.
 
-### Map Host Directory
+### Mount Host Directory
+
 ```bash
 docker run -it --name hostcontainer -v /home/ec2-user:/vida ubuntu /bin/bash
 cd /vida && ls
 ```
+> Mounts a directory from the host to the container – changes reflect both ways.
 
 ---
 
@@ -156,6 +228,7 @@ docker build -t myimage:v2 .
 docker run -it --name mycontainer2 myimage:v2 /bin/bash
 ls /tmp && cat /tmp/info.txt
 ```
+> Builds and runs a custom image with pre-included files and messages.
 
 ---
 
@@ -163,27 +236,26 @@ ls /tmp && cat /tmp/info.txt
 
 | Command | Description |
 |--------|-------------|
-| `docker run -it image /bin/bash` | Create and run a container |
-| `--name containername` | Give a name to container |
+| `docker run -it image /bin/bash` | Create and run a container interactively |
+| `--name containername` | Assign a name to a container |
 | `docker start` / `stop` / `rm` | Manage container lifecycle |
 | `docker exec -it name bash` | Access a running container |
-| `docker ps -a` | View all containers |
-| `docker images` | List local images |
-| `docker diff name` | See container file changes |
-| `docker commit` | Save container as image |
-| `docker build -t name .` | Build image from Dockerfile |
-| `-v host:container` | Mount host volume |
-| `--volumes-from name` | Share volume from container |
+| `docker ps -a` | View all containers (including stopped) |
+| `docker images` | List available Docker images |
+| `docker diff name` | Show file changes inside a container |
+| `docker commit` | Save a container state as a new image |
+| `docker build -t name .` | Build an image from a Dockerfile |
+| `-v host:container` | Mount host volume to container |
+| `--volumes-from name` | Share volumes between containers |
 | `docker image/container prune` | Clean up unused resources |
 
 ---
 
 ## 📌 Pro Tips
-- Use `--name` for easier container identification.
-- Volumes ensure data persists beyond container lifespans.
-- Use Dockerfiles to script your environment.
-- Regular cleanup keeps Docker lightweight:
 
+- Use `--name` for readable container identification.
+- Use volumes to persist data outside containers.
+- Clean unused containers/images regularly:
 ```bash
 docker container prune
 docker image prune
